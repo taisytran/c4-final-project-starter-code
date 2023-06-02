@@ -9,7 +9,7 @@ const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('TodosAccess')
 
-// TODO: Implement the dataLayer logic
+// TODO(done): Implement the dataLayer logic
 export class TodoAccess {
   constructor(
     private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
@@ -29,20 +29,6 @@ export class TodoAccess {
     return result.Items as TodoItem[]
   }
 
-  async getTodo(userId: string, todoId: string): Promise<TodoItem> {
-    logger.info('Get todo item ${todoId}')
-    const result = await this.docClient.query({
-      TableName: this.todosTable,
-      KeyConditionExpression: 'userId = :userId and todoId = :todoId',
-      ExpressionAttributeValues: {
-        ':userId': userId,
-        ':todoId': todoId
-      }
-    }).promise()
-
-    return result.Items[0] as TodoItem
-  }
-
   async createTodo(todoItem: TodoItem): Promise<TodoItem> {
     logger.info('Create a new todo item')
     const result = await this.docClient.put({
@@ -56,7 +42,7 @@ export class TodoAccess {
   }
 
   async updateTodo(userId: string, todoId: string, todoData: TodoUpdate): Promise<TodoUpdate> {
-    logger.info('Update a todo item ${todoId}')
+    logger.info(`Update a todo item ${todoId}`)
     const result = await this.docClient.update({
       TableName: this.todosTable,
       Key: { userId, todoId },
@@ -78,10 +64,10 @@ export class TodoAccess {
   }
 
   async deleteTodo(userId: string, todoId: string): Promise<string> {
-    logger.info('Delete a todo item ${todoId}')
+    logger.info(`Delete a todo item ${todoId}`)
     const result = await this.docClient.delete({
       TableName: this.todosTable,
-      Key: {userId, todoId }
+      Key: { userId, todoId }
     }).promise()
 
     logger.info(result)
@@ -90,7 +76,7 @@ export class TodoAccess {
   }
 
   async updateAttachmentUrl(userId: string, todoId: string, attachmentUrl: string): Promise<string> {
-    logger.info('Update a todo item attachment url ${todoId}')
+    logger.info(`Update a todo item attachment url ${todoId}`)
     const result = await this.docClient.update({
       TableName: this.todosTable,
       Key: {userId, todoId }
