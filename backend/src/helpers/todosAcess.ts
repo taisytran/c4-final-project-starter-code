@@ -79,7 +79,7 @@ export class TodoAccess {
     logger.info(`Update a todo item attachment url ${todoId}`)
     const result = await this.docClient.update({
       TableName: this.todosTable,
-      Key: {userId, todoId }
+      Key: {userId, todoId },
       ConditionExpression: 'attribute_exists(todoId)',
       UpdateExpression: 'set attachmentUrl = :attachmentUrl',
       ExpressionAttributeValues: {
