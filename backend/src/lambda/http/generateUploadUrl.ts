@@ -11,7 +11,7 @@ export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const todoId = event.pathParameters.todoId
     // TODO(done): Return a presigned URL to upload a file for a TODO item with the provided id
-    const presignedUloadUrl = await createAttachmentPresignedUrl(todoId)
+    const presignedUploadUrl = await createAttachmentPresignedUrl(todoId)
     // update attachment url
     const userId = getUserId(event)
     updateAttachmentUrl(userId, todoId)
@@ -23,7 +23,7 @@ export const handler = middy(
         'Access-Control-Allow-Credentials': true
       },
       body: JSON.stringify({
-        item: presignedUloadUrl
+        uploadUrl: presignedUploadUrl
       })
     }
   }
