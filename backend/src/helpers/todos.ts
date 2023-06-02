@@ -41,7 +41,7 @@ export async function updateAttachmentUrl(userId: string, todoId: string): Promi
   return todoAccess.updateAttachmentUrl(userId, todoId, attachmentUrl);
 }
 
-export async createAttachmentPresignedUrl(todoId: string): Promise<string> {
-  return await AttachmentUtils.getPresignedAttachmentUrl(todoId)
+export async function createAttachmentPresignedUrl(todoId: string): Promise<string> {
+  return AttachmentUtils.getPresignedAttachmentUrl(todoId)
 }
 
