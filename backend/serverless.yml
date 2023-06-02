@@ -13,8 +13,8 @@ provider:
   runtime: nodejs12.x
   lambdaHashingVersion: '20201221'
 
-  stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-1'}
+  stage: ${param:stage, 'dev'}
+  region: ${param:region, 'us-east-1'}
 
   tracing:
     lambda: true
@@ -32,20 +32,16 @@ provider:
     # Enable API Gateway logs
     restApi: true
 
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - xray:PutTelemetryRecords
-            - xray:PutTraceSegments
-          Resource: "*"
-
-
 functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
+        Resource: "*"
 
   # TODO(done): Configure this function - 
   # Provide iamRoleStatements property for performing Actions on DynamoDB
@@ -66,6 +62,11 @@ functions:
         Action:
           - dynamodb:GetItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
+        Resource: "*"
 
   # TODO(done): Configure this function - 
   # Provide iamRoleStatements property. Decide the Actions and AWS Resource. 
@@ -80,13 +81,18 @@ functions:
           cors: true
           authorizer: Auth
           request:
-            schemas:
+            schema:
               application/json: ${file(models/create-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:PutItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: Allow
+        Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
+        Resource: "*"
 
   # TODO(done): Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements, and request schemas
@@ -99,13 +105,18 @@ functions:
           cors: true
           authorizer: Auth
           request:
-            schemas:
+            schema:
               application/json: ${file(models/update-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:UpdateItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: Allow
+        Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
+        Resource: "*"
 
   # TODO(done): Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
@@ -122,6 +133,11 @@ functions:
         Action:
           - dynamodb:DeleteItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: Allow
+        Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
+        Resource: "*"
 
   # TODO(done): Configure this function
   # Provide property for setting up CORS, Authorizer, iamRoleStatements
@@ -144,6 +160,11 @@ functions:
           - dynamodb:Query
           - dynamodb:UpdateItem
         Resource: !GetAtt TodosTable.Arn
+      - Effect: Allow
+        Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
+        Resource: "*"
 
 resources:
   Resources:
@@ -152,14 +173,14 @@ resources:
     # Feel free to change the names as you like. 
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
-    Properties:
-      ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,GET,POST,PUT,DELETE'"
-      ResponseType: DEFAULT_4XX
-      RestApiId:
-        Ref: ApiGatewayRestApi
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
 
     # TODO(done): Create a DynamoDB table with local secondary index and a composite key
     TodosTable:
