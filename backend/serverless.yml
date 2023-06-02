@@ -10,11 +10,11 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs18.x
   lambdaHashingVersion: '20201221'
 
-  stage: ${param:stage, 'dev'}
-  region: ${param:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
 
   tracing:
     lambda: true
