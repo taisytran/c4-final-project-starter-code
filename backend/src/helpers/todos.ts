@@ -1,11 +1,9 @@
 import { TodosAccess } from './todosAcess'
-import { AttachmentUtils } from './attachmentUtils';
+import { getPresignedAttachmentUrl } from './attachmentUtils';
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
-import * as createError from 'http-errors'
 
 // TODO(done): Implement businessLogic
 const todoAccess = new TodosAccess()
@@ -42,6 +40,6 @@ export async function updateAttachmentUrl(userId: string, todoId: string): Promi
 }
 
 export async function createAttachmentPresignedUrl(todoId: string): Promise<string> {
-  return AttachmentUtils.getPresignedAttachmentUrl(todoId)
+  return getPresignedAttachmentUrl(todoId)
 }
 

@@ -1,10 +1,9 @@
 import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
-import jwksRsa from 'jwks-rsa'
+import * as jwksRsa from 'jwks-rsa'
 
-import { verify, decode, JwtHeader, SigningKeyCallback } from 'jsonwebtoken'
+import { verify, decode } from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
-import Axios from 'axios'
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 
@@ -65,7 +64,8 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   // TODO(done): Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return verify(token, getKey, { algorithms: ['RS256'] }) as JwtPayload
+  const signingKey = await jwksClient.getSigningKey(jwt.header.kid);
+  return verify(token, signingKey.publicKey, { algorithms: ['RS256'] }) as JwtPayload;
 }
 
 function getToken(authHeader: string): string {
@@ -78,11 +78,4 @@ function getToken(authHeader: string): string {
   const token = split[1]
 
   return token
-}
-
-function getKey(header: JwtHeader, callback: SigningKeyCallback) {
-  jwksClient.getSigningKey(header.kid, function(err, key) {
-    var signingKey = key.publicKey || key.rsaPublicKey;
-    callback(null, signingKey);
-  });
 }

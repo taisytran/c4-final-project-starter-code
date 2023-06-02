@@ -14,7 +14,7 @@ export const handler = middy(
     const presignedUloadUrl = await createAttachmentPresignedUrl(todoId)
     // update attachment url
     const userId = getUserId(event)
-    const result = updateAttachmentUrl(userId, todoId)
+    updateAttachmentUrl(userId, todoId)
 
     return {
       statusCode: 201,

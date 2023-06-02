@@ -1,16 +1,17 @@
-import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
-import { DocumentClient } from 'aws-sdk/clients/dynamodb'
-import { createLogger } from '../utils/logger'
-import { TodoItem } from '../models/TodoItem'
+import * as AWS from 'aws-sdk';
+//import * as AWSXRay from 'aws-xray-sdk';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { createLogger } from '../utils/logger';
+import { TodoItem } from '../models/TodoItem';
 import { TodoUpdate } from '../models/TodoUpdate';
 
-const XAWS = AWSXRay.captureAWS(AWS)
+const AWSXRay = require('aws-xray-sdk');
+const XAWS = AWSXRay.captureAWS(AWS);
 
-const logger = createLogger('TodosAccess')
+const logger = createLogger('TodosAccess');
 
 // TODO(done): Implement the dataLayer logic
-export class TodoAccess {
+export class TodosAccess {
   constructor(
     private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
     private readonly todosTable = process.env.TODOS_TABLE
@@ -41,7 +42,7 @@ export class TodoAccess {
     return todoItem
   }
 
-  async updateTodo(userId: string, todoId: string, todoData: TodoUpdate): Promise<TodoUpdate> {
+  async updateTodo(userId: string, todoId: string, todoData: TodoUpdate): Promise<string> {
     logger.info(`Update a todo item ${todoId}`)
     const result = await this.docClient.update({
       TableName: this.todosTable,
@@ -60,7 +61,7 @@ export class TodoAccess {
 
     logger.info(result)
 
-    return todoData
+    return todoId
   }
 
   async deleteTodo(userId: string, todoId: string): Promise<string> {
